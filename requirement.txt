@@ -1,0 +1,6 @@
+opencv-python
+numpy
+torch
+insightface
+pandas
+psycopg2-binary
