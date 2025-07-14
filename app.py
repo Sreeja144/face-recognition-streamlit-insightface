@@ -3,6 +3,8 @@ os.environ['STREAMLIT_SERVER_PORT'] = '8000'
 os.environ['STREAMLIT_SERVER_ADDRESS'] = '0.0.0.0'
 
 import streamlit as st
+st.set_page_config(page_title="Face Detection", layout="wide")  # ✅ MUST BE FIRST
+
 import cv2
 import numpy as np
 import pickle
@@ -36,7 +38,6 @@ with open("blacklist_faces.pkl", "rb") as f:
     blacklist_faces = pickle.load(f)
 
 # === Streamlit UI ===
-st.set_page_config(page_title="Face Detection", layout="wide")
 st.title("🎥 Face Detection System with Email & DB")
 
 frame_display = st.empty()
@@ -54,6 +55,7 @@ if "unknown_faces" not in st.session_state:
 
 # === Helpers ===
 seen_unknown_embeddings = []
+
 def is_duplicate(embedding, seen_list, threshold=0.6):
     for emb in seen_list:
         sim = np.dot(embedding, emb) / (np.linalg.norm(embedding) * np.linalg.norm(emb))
@@ -89,7 +91,7 @@ def send_email_with_images(image_paths, to_email):
     msg.set_content(f"""
 Hi,
 
-{len(image_paths)} unknown faces were detected in the classroom video.
+Some unknown faces were detected in the classroom video.
 
 - Attached are a few images.
 - Stored in 'unknown_faces' folder and logged to DB.
@@ -106,7 +108,7 @@ Face Detection System
             server.login(EMAIL_SENDER, EMAIL_PASSWORD)
             server.send_message(msg)
         st.toast("✅ Email sent successfully!", icon="📨")
-        st.success(f"📧 Sent to {to_email} | Unknowns: {len(image_paths)}")
+        st.success(f"📧 Sent to {to_email}")
     except Exception as e:
         st.error("❌ Email Failed")
         st.code(str(e))
