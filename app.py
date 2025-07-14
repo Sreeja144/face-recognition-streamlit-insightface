@@ -35,6 +35,11 @@ email_icon = st.empty()
 
 start_btn = st.button("▶️ Start Detection")
 
+# === Added control variable to avoid freezing / broken loop ===
+if "detection_active" not in st.session_state:
+    st.session_state.detection_active = False
+
+# Session variables
 if "email_sent" not in st.session_state:
     st.session_state.email_sent = False
 if "final_email" not in st.session_state:
@@ -103,6 +108,9 @@ Face Detection System
 
 # === DETECTION ===
 if start_btn:
+    st.session_state.detection_active = True  # Start flag ON
+
+if st.session_state.detection_active:
     app = FaceAnalysis(name="buffalo_l", providers=['CPUExecutionProvider'])
     app.prepare(ctx_id=0, det_size=(640, 640))
 
@@ -114,11 +122,13 @@ if start_btn:
     unknown_faces = []
     frame_skip = 70
 
-    while True:
+    while st.session_state.detection_active:
         for _ in range(frame_skip):
             cap.read()
         ret, frame = cap.read()
         if not ret:
+            st.warning("End of video.")
+            st.session_state.detection_active = False
             break
 
         faces = app.get(frame)
