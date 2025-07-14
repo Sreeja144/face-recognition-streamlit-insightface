@@ -115,7 +115,7 @@ Face Detection System
 
 # === DETECTION ===
 if start_btn:
-    app = FaceAnalysis(name="buffalo_l", providers=['CPUExecutionProvider'])
+    app = FaceAnalysis(name="buffalo_s", providers=['CPUExecutionProvider'])
     app.prepare(ctx_id=0, det_size=(640, 640))
 
     cap = cv2.VideoCapture(VIDEO_PATH)
