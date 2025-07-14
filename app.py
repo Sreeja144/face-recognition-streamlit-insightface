@@ -1,7 +1,12 @@
+# ✅ ADD THESE AT THE TOP: streamlit server config for Render
+import os
+os.environ['STREAMLIT_SERVER_PORT'] = '8000'
+os.environ['STREAMLIT_SERVER_ADDRESS'] = '0.0.0.0'
+
+# ✅ YOUR ORIGINAL IMPORTS
 import streamlit as st
 import cv2
 import numpy as np
-import os
 import pickle
 import smtplib
 import psycopg2
@@ -11,15 +16,15 @@ from email.message import EmailMessage
 from insightface.app import FaceAnalysis
 
 # === CONFIGURATION ===
-VIDEO_PATH = "video/classroom.mp4"
+VIDEO_PATH = "video/classroom.mp4"   # ✅ Ensure this is uploaded & pushed to Git
 EMAIL_SENDER = "smadala4@gitam.in"
 EMAIL_PASSWORD = "kljn nztp qqot juwe"
 DB_URL = "postgresql://faceuser:gruqofbpAImi7EY6tyrGQjVsmMgMPiG6@dpg-d1oiqqadbo4c73b4fca0-a.frankfurt-postgres.render.com/face_db_7r21"
 
-# Make output dir
+# ✅ Ensure unknown_faces folder exists in deployment
 os.makedirs("unknown_faces", exist_ok=True)
 
-# Load face embeddings
+# === Load Embeddings ===
 with open("registered_faces.pkl", "rb") as f:
     registered_faces = pickle.load(f)
 with open("blacklist_faces.pkl", "rb") as f:
@@ -35,11 +40,6 @@ email_icon = st.empty()
 
 start_btn = st.button("▶️ Start Detection")
 
-# === Added control variable to avoid freezing / broken loop ===
-if "detection_active" not in st.session_state:
-    st.session_state.detection_active = False
-
-# Session variables
 if "email_sent" not in st.session_state:
     st.session_state.email_sent = False
 if "final_email" not in st.session_state:
@@ -47,7 +47,7 @@ if "final_email" not in st.session_state:
 if "unknown_faces" not in st.session_state:
     st.session_state.unknown_faces = []
 
-# Deduplication tracking
+# === Utils ===
 seen_unknown_embeddings = []
 def is_duplicate(embedding, seen_list, threshold=0.6):
     for emb in seen_list:
@@ -106,11 +106,8 @@ Face Detection System
         st.error("❌ Email Failed")
         st.code(str(e))
 
-# === DETECTION ===
+# === Start Detection ===
 if start_btn:
-    st.session_state.detection_active = True  # Start flag ON
-
-if st.session_state.detection_active:
     app = FaceAnalysis(name="buffalo_l", providers=['CPUExecutionProvider'])
     app.prepare(ctx_id=0, det_size=(640, 640))
 
@@ -122,13 +119,11 @@ if st.session_state.detection_active:
     unknown_faces = []
     frame_skip = 70
 
-    while st.session_state.detection_active:
+    while True:
         for _ in range(frame_skip):
             cap.read()
         ret, frame = cap.read()
         if not ret:
-            st.warning("End of video.")
-            st.session_state.detection_active = False
             break
 
         faces = app.get(frame)
@@ -176,6 +171,6 @@ with st.form("final_email_form"):
         send_email_with_images(st.session_state.unknown_faces, st.session_state.final_email)
         st.session_state.email_sent = True
 
-# === Floating Email Icon ===
+# === Floating Icon ===
 with email_icon.container():
     st.markdown("<div style='position: fixed; bottom: 20px; right: 30px; font-size: 24px;'>📨</div>", unsafe_allow_html=True)
