@@ -23,7 +23,8 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
 # Expose Streamlit default port
-EXPOSE 8501
+EXPOSE 8000
 
 # Run Streamlit app
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "app.py", "--server.port=8000", "--server.enableCORS=false"]
+
