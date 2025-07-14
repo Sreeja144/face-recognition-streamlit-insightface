@@ -14,7 +14,7 @@ from email.message import EmailMessage
 from insightface.app import FaceAnalysis
 
 # === CONFIGURATION ===
-VIDEO_PATH = "video/classroom.mp4"
+VIDEO_PATH = "classroom.mp4"
 EMAIL_SENDER = "smadala4@gitam.in"
 EMAIL_PASSWORD = "kljn nztp qqot juwe"
 DB_URL = "postgresql://faceuser:gruqofbpAImi7EY6tyrGQjVsmMgMPiG6@dpg-d1oiqqadbo4c73b4fca0-a.frankfurt-postgres.render.com/face_db_7r21"
